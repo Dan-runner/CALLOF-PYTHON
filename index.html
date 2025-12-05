@@ -5,195 +5,277 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aprende Python Interactivo</title>
     
-    <!-- Carga de librerías externas para estilos e iconos -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-    <!-- 
-      =======================================================================
-      SECCIÓN CSS (style.css)
-      Si separas los archivos, mueve el contenido dentro de <style> a un .css
-      =======================================================================
-    -->
+    <!-- Configuración personalizada de Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            dark: '#0f172a',    // Slate 900
+                            primary: '#3b82f6', // Blue 500
+                            accent: '#8b5cf6',  // Violet 500
+                            success: '#10b981', // Emerald 500
+                            editor: '#1e293b',  // Slate 800
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
+        /* Estilos base y utilidades personalizadas */
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
+            background-color: #f8fafc; /* Slate 50 */
         }
 
-        /* Estilos para el editor de código */
-        .code-font {
-            font-family: 'Fira Code', monospace;
+        /* Animación suave para transiciones */
+        .transition-all-300 {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .editor-container {
-            position: relative;
-            border-radius: 0.5rem;
-            overflow: hidden;
-            background-color: #1e293b; /* Slate 800 */
+        /* Editor de Código: Scrollbar personalizado oscuro */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 5px;
+            border: 2px solid #1e293b;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
         }
 
-        /* Área de texto donde escribe el usuario */
-        #code-input {
-            width: 100%;
-            height: 250px;
-            background-color: transparent;
-            color: #e2e8f0;
-            border: none;
-            padding: 1rem;
-            font-size: 0.95rem;
-            line-height: 1.5;
-            resize: none;
-            outline: none;
-            z-index: 10;
-        }
-
-        /* Estilos para la consola simulada */
-        .console-output {
-            background-color: #0f172a; /* Slate 900 */
-            color: #10b981; /* Emerald 500 */
-            font-family: 'Fira Code', monospace;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            min-height: 80px;
-            margin-top: 1rem;
-            white-space: pre-wrap;
-        }
-
-        .console-error {
-            color: #ef4444; /* Red 500 */
-        }
-
-        /* Scrollbar personalizado */
-        ::-webkit-scrollbar {
+        /* Scrollbar general más sutil */
+        .page-scrollbar::-webkit-scrollbar {
             width: 8px;
-            height: 8px;
         }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1; 
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1; 
+        .page-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
             border-radius: 4px;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8; 
+
+        /* Efecto de "Active" en navegación con borde degradado */
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0.1) 0%, transparent 100%);
+            border-left: 4px solid #3b82f6;
+            color: #3b82f6;
+        }
+        
+        /* Efecto Glow sutil para tarjetas */
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .card-shadow:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
         }
 
-        /* Efecto para el elemento activo de la navegación */
-        .nav-item.active {
-            background-color: #dbeafe; /* Blue 100 */
-            color: #2563eb; /* Blue 600 */
-            border-right: 4px solid #2563eb;
-            font-weight: 600;
+        /* Terminal blinking cursor animation */
+        .cursor-blink {
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
         }
     </style>
 </head>
-<body class="h-screen flex flex-col md:flex-row overflow-hidden">
+<body class="h-screen flex flex-col md:flex-row overflow-hidden text-slate-800">
 
     <!-- 
       =======================================================================
-      ESTRUCTURA HTML (index.html)
+      SIDEBAR (Navegación)
+      Diseño oscuro con degradado
       =======================================================================
     -->
-
-    <!-- Sidebar / Navegación -->
-    <aside class="w-full md:w-64 bg-white border-r border-gray-200 flex-shrink-0 flex flex-col z-20 shadow-md md:shadow-none h-auto md:h-full">
-        <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-slate-900 text-white md:bg-white md:text-slate-900">
-            <div class="flex items-center gap-2">
-                <i class="fa-brands fa-python text-2xl text-yellow-400 md:text-blue-600"></i>
-                <h1 class="text-lg font-bold tracking-tight">PyStarter</h1>
+    <aside class="w-full md:w-72 bg-slate-900 text-slate-300 flex-shrink-0 flex flex-col z-30 shadow-2xl h-auto md:h-full relative">
+        <!-- Logo Area -->
+        <div class="p-6 border-b border-slate-800 flex items-center gap-3 bg-slate-950">
+            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center shadow-lg text-white">
+                <i class="fa-brands fa-python text-2xl"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-bold text-white tracking-tight">PyStarter <span class="text-blue-500">.io</span></h1>
+                <p class="text-xs text-slate-500 font-medium">Aprende código real</p>
             </div>
             <!-- Botón menú móvil -->
-            <button id="mobile-menu-btn" class="md:hidden text-white focus:outline-none">
-                <i class="fa-solid fa-bars"></i>
+            <button id="mobile-menu-btn" class="md:hidden ml-auto text-slate-400 hover:text-white transition-colors">
+                <i class="fa-solid fa-bars text-xl"></i>
             </button>
         </div>
 
         <!-- Lista de Temas -->
-        <nav id="topic-list" class="flex-1 overflow-y-auto hidden md:block py-2">
-            <!-- Los temas se generarán dinámicamente con JS -->
+        <nav id="topic-list" class="flex-1 overflow-y-auto page-scrollbar py-4 space-y-1 hidden md:block">
+            <!-- Los temas se inyectan aquí -->
         </nav>
 
-        <div class="p-4 border-t border-gray-100 text-xs text-gray-500 text-center hidden md:block">
-            &copy; 2023 PyStarter Edu
+        <!-- Footer Sidebar -->
+        <div class="p-4 border-t border-slate-800 bg-slate-950 text-center">
+            <div class="flex justify-center space-x-4 mb-2">
+                <a href="#" class="text-slate-500 hover:text-blue-400 transition-colors"><i class="fa-brands fa-github"></i></a>
+                <a href="#" class="text-slate-500 hover:text-blue-400 transition-colors"><i class="fa-brands fa-twitter"></i></a>
+                <a href="#" class="text-slate-500 hover:text-blue-400 transition-colors"><i class="fa-solid fa-globe"></i></a>
+            </div>
+            <p class="text-xs text-slate-600">&copy; 2023 PyStarter Education</p>
         </div>
     </aside>
 
-    <!-- Área Principal de Contenido -->
-    <main class="flex-1 flex flex-col h-full overflow-hidden relative">
+    <!-- 
+      =======================================================================
+      ÁREA PRINCIPAL
+      Fondo claro con patrón sutil
+      =======================================================================
+    -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden relative bg-slate-50">
         
-        <!-- Header Móvil del Tema (Opcional visualmente en escritorio) -->
-        <header class="bg-white border-b border-gray-200 p-4 shadow-sm flex justify-between items-center">
-            <h2 id="lesson-title" class="text-xl font-bold text-gray-800">Cargando...</h2>
-            <div class="text-sm font-medium px-3 py-1 bg-blue-100 text-blue-700 rounded-full" id="lesson-progress">
-                Nivel 1
+        <!-- Header Superior -->
+        <header class="bg-white border-b border-slate-200 px-6 py-4 shadow-sm flex justify-between items-center z-20">
+            <div>
+                <h2 id="lesson-title" class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                    <span class="inline-block w-2 h-8 bg-blue-500 rounded-full mr-1"></span>
+                    Cargando lección...
+                </h2>
+            </div>
+            
+            <!-- Barra de Progreso Visual -->
+            <div class="hidden sm:flex items-center gap-4">
+                <div class="text-right">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Progreso</p>
+                    <p id="lesson-progress-text" class="text-sm font-bold text-blue-600">0%</p>
+                </div>
+                <div class="w-32 h-2 bg-slate-200 rounded-full overflow-hidden">
+                    <div id="progress-bar" class="h-full bg-gradient-to-r from-blue-500 to-violet-500 w-0 transition-all duration-500 ease-out"></div>
+                </div>
             </div>
         </header>
 
         <!-- Contenedor Scrollable -->
-        <div class="flex-1 overflow-y-auto p-4 md:p-8">
-            <div class="max-w-4xl mx-auto space-y-6">
+        <div class="flex-1 overflow-y-auto page-scrollbar p-4 md:p-8 relative">
+            
+            <!-- Fondo decorativo desenfocado -->
+            <div class="absolute top-0 left-0 w-full h-64 bg-gradient-to-b from-blue-50 to-transparent pointer-events-none z-0"></div>
 
-                <!-- Sección: Teoría -->
-                <section class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <div class="flex items-center gap-2 mb-4">
-                        <i class="fa-solid fa-book-open text-blue-500"></i>
-                        <h3 class="text-lg font-semibold text-gray-800">Concepto Teórico</h3>
-                    </div>
-                    <div id="theory-content" class="prose text-gray-600 leading-relaxed">
-                        <!-- El contenido teórico se inyecta aquí -->
-                    </div>
-                </section>
+            <div class="max-w-5xl mx-auto space-y-8 relative z-10">
 
-                <!-- Sección: Desafío y Editor -->
-                <section class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <div class="flex items-center gap-2 mb-4">
-                        <i class="fa-solid fa-code text-green-600"></i>
-                        <h3 class="text-lg font-semibold text-gray-800">Tu Misión</h3>
-                    </div>
-                    
-                    <p id="challenge-desc" class="mb-4 text-gray-700 font-medium bg-green-50 p-3 rounded-md border border-green-100">
-                        <!-- Descripción del desafío aquí -->
-                    </p>
-
-                    <!-- Editor de Código -->
-                    <div class="editor-container shadow-inner">
-                        <div class="flex justify-between items-center bg-slate-700 px-4 py-2 border-b border-slate-600">
-                            <span class="text-xs text-slate-300 font-mono">main.py</span>
-                            <span class="text-xs text-slate-400"><i class="fa-brands fa-python"></i> Python 3.x</span>
+                <!-- PANEL 1: Teoría -->
+                <section class="bg-white rounded-xl card-shadow border border-slate-200 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
+                            <i class="fa-solid fa-graduation-cap text-sm"></i>
                         </div>
-                        <textarea id="code-input" class="code-font" spellcheck="false" placeholder="# Escribe tu código aquí..."></textarea>
+                        <h3 class="font-bold text-slate-700">Concepto Clave</h3>
                     </div>
-
-                    <!-- Botones de Acción -->
-                    <div class="mt-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-                        <button id="run-btn" class="w-full sm:w-auto px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg shadow transition-colors flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-play"></i> Ejecutar Código
-                        </button>
-                        
-                        <!-- Botón Siguiente Nivel (Oculto inicialmente) -->
-                        <button id="next-btn" class="w-full sm:w-auto px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow transition-colors items-center justify-center gap-2 hidden">
-                            Siguiente Lección <i class="fa-solid fa-arrow-right"></i>
-                        </button>
-                    </div>
-
-                    <!-- Consola / Salida -->
-                    <div class="mt-6">
-                        <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Terminal / Salida:</label>
-                        <div id="console-output" class="console-output">Esperando ejecución...</div>
+                    <div id="theory-content" class="p-6 prose prose-slate max-w-none text-slate-600 leading-relaxed">
+                        <!-- Contenido inyectado -->
                     </div>
                 </section>
 
+                <!-- PANEL 2: Práctica (Workspace) -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    
+                    <!-- Columna Izquierda: Instrucciones -->
+                    <div class="space-y-6">
+                        <section class="bg-white rounded-xl card-shadow border border-slate-200 p-6 h-full flex flex-col">
+                            <div class="flex items-center gap-2 mb-4">
+                                <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center">
+                                    <i class="fa-solid fa-lightbulb"></i>
+                                </div>
+                                <h3 class="font-bold text-slate-700">Tu Misión</h3>
+                            </div>
+                            
+                            <div id="challenge-desc" class="flex-1 text-slate-700 font-medium mb-6">
+                                <!-- Descripción inyectada -->
+                            </div>
+
+                            <!-- Consola de Resultados (Estilo Terminal) -->
+                            <div class="mt-auto">
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                                        <i class="fa-solid fa-terminal"></i> Terminal Output
+                                    </label>
+                                    <span id="status-badge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-500 uppercase">Idle</span>
+                                </div>
+                                <div id="console-output" class="bg-slate-900 rounded-lg p-4 font-mono text-sm min-h-[120px] max-h-[200px] overflow-y-auto custom-scrollbar text-slate-300 border border-slate-800 shadow-inner">
+                                    <span class="text-slate-500">$ python3 main.py</span><br>
+                                    <span class="opacity-50">Esperando ejecución...</span><span class="cursor-blink text-blue-500">_</span>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- Columna Derecha: Editor de Código -->
+                    <div class="flex flex-col h-full">
+                        <!-- Ventana del Editor (Estilo macOS) -->
+                        <div class="rounded-t-xl bg-slate-800 px-4 py-3 flex items-center justify-between border-b border-slate-700 shadow-lg">
+                            <div class="flex gap-2">
+                                <div class="w-3 h-3 rounded-full bg-red-500 hover:bg-red-600 transition-colors"></div>
+                                <div class="w-3 h-3 rounded-full bg-yellow-500 hover:bg-yellow-600 transition-colors"></div>
+                                <div class="w-3 h-3 rounded-full bg-green-500 hover:bg-green-600 transition-colors"></div>
+                            </div>
+                            <div class="text-xs font-mono text-slate-400 flex items-center gap-2">
+                                <i class="fa-brands fa-python"></i> main.py
+                            </div>
+                            <div class="text-xs text-slate-500">Python 3.11</div>
+                        </div>
+
+                        <!-- Área de Texto del Editor -->
+                        <div class="flex-1 relative bg-slate-900 border-x border-slate-800 shadow-2xl editor-container group">
+                            <!-- Números de línea simulados -->
+                            <div class="absolute left-0 top-0 bottom-0 w-10 bg-slate-900 border-r border-slate-800 text-slate-600 text-right pr-2 pt-4 font-mono text-sm select-none leading-[1.5]">
+                                1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10
+                            </div>
+                            
+                            <textarea id="code-input" 
+                                class="w-full h-[300px] lg:h-full bg-transparent text-slate-200 border-none p-4 pl-12 font-mono text-sm leading-[1.5] resize-none focus:outline-none custom-scrollbar selection:bg-blue-500/30" 
+                                spellcheck="false" 
+                                placeholder="# Escribe tu código Python aquí..."></textarea>
+                        </div>
+
+                        <!-- Barra de Herramientas del Editor -->
+                        <div class="bg-slate-800 rounded-b-xl p-3 flex justify-between items-center shadow-lg border-t border-slate-700">
+                            <span class="text-xs text-slate-400 hidden sm:inline"><i class="fa-solid fa-code-branch"></i> master</span>
+                            
+                            <div class="flex gap-3 w-full sm:w-auto">
+                                <button id="run-btn" class="flex-1 sm:flex-none px-5 py-2 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white text-sm font-semibold rounded-lg shadow-lg shadow-emerald-900/20 transition-all-300 flex items-center justify-center gap-2 transform active:scale-95">
+                                    <i class="fa-solid fa-play text-xs"></i> Ejecutar
+                                </button>
+                                
+                                <button id="next-btn" class="hidden flex-1 sm:flex-none px-5 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-sm font-semibold rounded-lg shadow-lg shadow-blue-900/20 transition-all-300 items-center justify-center gap-2 transform active:scale-95 animate-pulse">
+                                    Siguiente <i class="fa-solid fa-arrow-right text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div> <!-- Fin Grid -->
+                
+                <div class="h-8"></div> <!-- Espaciador final -->
             </div>
         </div>
     </main>
 
     <!-- 
       =======================================================================
-      SECCIÓN JAVASCRIPT (script.js)
-      Si separas los archivos, mueve el contenido dentro de <script> a un .js
+      JAVASCRIPT LÓGICA (Funcionalidad preservada y mejorada)
       =======================================================================
     -->
     <script>
@@ -201,202 +283,233 @@
         const lessons = [
             {
                 id: 0,
-                title: "1. Introducción y Variables",
+                title: "Variables y Asignación",
                 theory: `
-                    <p>En Python, una <strong>variable</strong> es como una caja donde puedes guardar información. A diferencia de otros lenguajes, no necesitas declarar el tipo de dato; Python es lo suficientemente inteligente para saberlo.</p>
-                    <br>
-                    <p class="font-mono text-sm bg-gray-100 p-2 rounded">nombre_variable = valor</p>
-                    <br>
-                    <p>Para asignar un valor, usamos el signo igual (<code>=</code>).</p>
+                    <p class="mb-4">Imagina que una variable es como una <strong>etiqueta</strong> que le pones a una caja para saber qué hay dentro. En Python, crear una variable es tan fácil como elegir un nombre y usar el operador <code>=</code>.</p>
+                    <div class="bg-slate-100 p-4 rounded-lg border-l-4 border-blue-500 mb-4 font-mono text-sm text-slate-700 shadow-sm">
+                        <span class="text-blue-600">nombre_variable</span> <span class="text-slate-400">=</span> <span class="text-green-600">valor</span>
+                    </div>
+                    <p>No necesitas decirle a Python qué tipo de dato es; él lo averigua por ti (tipado dinámico).</p>
                 `,
-                challenge: "Declara una variable llamada <code>edad</code> y asígnale el valor numérico <code>25</code>.",
-                initialCode: "# Declara tu variable aquí\n",
+                challenge: "Necesitamos guardar la edad de un usuario. Crea una variable llamada <code class='text-red-500 bg-red-50 px-1 rounded border border-red-100'>edad</code> y asígnale el valor <code class='text-blue-600 bg-blue-50 px-1 rounded border border-blue-100'>25</code>.",
+                initialCode: "# Tu código va aquí\n\n",
                 validate: (code) => {
-                    // Regex busca: palabra 'edad', opcionalmente espacios, signo igual, opcionalmente espacios, numero 25
                     const regex = /(^|\n)\s*edad\s*=\s*25\s*($|\n|#)/;
                     if (regex.test(code)) {
-                        return { success: true, message: ">> Variable asignada correctamente en memoria.\n>> edad = 25" };
+                        return { success: true, output: "Variable creada en memoria: { edad: 25 }", message: "¡Excelente! Has definido tu primera variable." };
                     } else {
-                        // Verificaciones parciales para dar mejores pistas
-                        if(code.includes('25') && !code.includes('edad')) return { success: false, message: "Error: Tienes el valor 25, pero la variable debe llamarse 'edad'." };
-                        if(code.includes('edad') && !code.includes('25')) return { success: false, message: "Error: Creaste la variable 'edad', pero el valor no es 25." };
-                        return { success: false, message: "NameError: No se encontró la definición correcta de la variable 'edad'." };
+                        if(code.includes('25') && !code.includes('edad')) return { success: false, output: "Error: Valor 25 encontrado, pero falta la variable 'edad'.", message: "Revisa el nombre de la variable." };
+                        if(code.includes('edad') && !code.includes('25')) return { success: false, output: "Error: Variable 'edad' encontrada, valor incorrecto.", message: "La variable debe valer 25." };
+                        return { success: false, output: "NameError: name 'edad' is not defined", message: "Intenta escribir: edad = 25" };
                     }
                 }
             },
             {
                 id: 1,
-                title: "2. Tipos de Datos y Strings",
+                title: "Strings y Concatenación",
                 theory: `
-                    <p>Las cadenas de texto (Strings) en Python se definen usando comillas simples (<code>' '</code>) o dobles (<code>" "</code>).</p>
-                    <p class="mt-2">Podemos unir (concatenar) textos usando el operador <code>+</code>.</p>
-                    <br>
-                    <p class="font-mono text-sm bg-gray-100 p-2 rounded">print("Hola " + "Mundo")</p>
+                    <p class="mb-4">Las cadenas de texto (<strong>Strings</strong>) son secuencias de caracteres encerradas en comillas. Puedes usar comillas simples <code>' '</code> o dobles <code>" "</code>.</p>
+                    <p class="mb-2">¿Quieres unir dos textos? ¡Súmalos!</p>
+                    <div class="bg-slate-100 p-4 rounded-lg border-l-4 border-violet-500 mb-4 font-mono text-sm text-slate-700 shadow-sm">
+                        print(<span class="text-green-600">"Hola "</span> + <span class="text-green-600">"Mundo"</span>)
+                    </div>
                 `,
-                challenge: "Usa la función <code>print()</code> para mostrar en pantalla la frase exacta: <strong>Hola Python</strong>",
-                initialCode: "# Imprime el mensaje abajo\n",
+                challenge: "Usa <code>print()</code> para mostrar en la consola el saludo: <strong>Hola Python</strong>. Asegúrate de escribirlo exactamente igual.",
+                initialCode: "# Imprime el saludo abajo\n",
                 validate: (code) => {
-                    // Busca variaciones de print("Hola Python") o print('Hola Python')
                     const regex = /print\s*\(\s*(["'])Hola Python\1\s*\)/;
                     if (regex.test(code)) {
-                        return { success: true, message: "Hola Python\n\n>> ¡Programa ejecutado con éxito!" };
+                        return { success: true, output: "Hola Python", message: "¡Perfecto! Dominas la impresión en pantalla." };
                     }
-                    return { success: false, message: "Error: Asegúrate de usar print() y que el texto sea exactamente 'Hola Python' entre comillas." };
+                    return { success: false, output: "Error de salida", message: "Asegúrate de usar print() con el texto 'Hola Python' entre comillas." };
                 }
             },
             {
                 id: 2,
-                title: "3. Condicionales (If)",
+                title: "Lógica Condicional (If)",
                 theory: `
-                    <p>Los condicionales nos permiten tomar decisiones. La sentencia <code>if</code> ejecuta un bloque de código solo si la condición es verdadera.</p>
-                    <p class="mt-2 text-red-500 font-semibold">¡Importante! Python usa la indentación (sangría) para definir qué código está dentro del if.</p>
-                    <br>
-                    <pre class="font-mono text-sm bg-gray-100 p-2 rounded">if numero > 10:
-    print("Es mayor")</pre>
+                    <p class="mb-4">Los programas necesitan tomar decisiones. La sentencia <code>if</code> (si) evalúa si algo es verdadero.</p>
+                    <div class="bg-amber-50 p-4 rounded-lg border border-amber-200 mb-4 text-sm text-amber-800 flex gap-3 items-start">
+                        <i class="fa-solid fa-triangle-exclamation mt-1"></i>
+                        <div><strong>¡Cuidado con la indentación!</strong><br>En Python, los espacios al inicio de la línea son obligatorios para indicar qué código va dentro del if.</div>
+                    </div>
+                    <div class="bg-slate-100 p-4 rounded-lg border-l-4 border-pink-500 font-mono text-sm text-slate-700 shadow-sm">
+                        <span class="text-purple-600">if</span> numero > <span class="text-blue-600">10</span>:<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-blue-600">print</span>(<span class="text-green-600">"Es grande"</span>)
+                    </div>
                 `,
-                challenge: "Escribe una condición <code>if</code> que verifique si <code>x</code> es mayor que 5. Si es cierto, imprime 'Mayor'. (Asume que x ya vale 10).",
+                challenge: "Escribe un <code>if</code> que verifique si <code>x</code> es mayor que 5. Si es cierto, imprime 'Mayor'. (x ya vale 10).",
                 initialCode: "x = 10\n# Escribe tu if abajo:\n",
                 validate: (code) => {
-                    // Validar estructura básica: if x > 5:
                     const ifRegex = /if\s+x\s*>\s*5\s*:/;
-                    // Validar el print con indentación
                     const printRegex = /\n\s+print\s*\(\s*(["'])Mayor\1\s*\)/;
                     
-                    if (!ifRegex.test(code)) {
-                        return { success: false, message: "SyntaxError: Revisa la línea del 'if'. Debe ser: if x > 5:" };
-                    }
-                    if (!printRegex.test(code)) {
-                        return { success: false, message: "IndentationError: Asegúrate de que el print esté indentado (con espacios) debajo del if y que imprimas 'Mayor'." };
-                    }
-                    return { success: true, message: "Mayor\n\n>> Lógica condicional correcta." };
+                    if (!ifRegex.test(code)) return { success: false, output: "SyntaxError: invalid syntax", message: "Revisa la línea del if. ¿Olvidaste los dos puntos ':'?" };
+                    if (!printRegex.test(code)) return { success: false, output: "IndentationError: expected an indented block", message: "El print debe tener 4 espacios antes." };
+                    
+                    return { success: true, output: "Mayor", message: "¡Lógica impecable!" };
                 }
             }
         ];
 
-        /* --- LÓGICA DE LA APLICACIÓN --- */
-        let currentLessonIndex = 0;
-
-        // Elementos del DOM
-        const dom = {
-            topicList: document.getElementById('topic-list'),
-            lessonTitle: document.getElementById('lesson-title'),
-            lessonProgress: document.getElementById('lesson-progress'),
-            theoryContent: document.getElementById('theory-content'),
-            challengeDesc: document.getElementById('challenge-desc'),
-            codeInput: document.getElementById('code-input'),
-            runBtn: document.getElementById('run-btn'),
-            nextBtn: document.getElementById('next-btn'),
-            consoleOutput: document.getElementById('console-output'),
-            mobileMenuBtn: document.getElementById('mobile-menu-btn')
+        /* --- UI Controller --- */
+        let currentIndex = 0;
+        
+        const ui = {
+            nav: document.getElementById('topic-list'),
+            title: document.getElementById('lesson-title'),
+            progressBar: document.getElementById('progress-bar'),
+            progressText: document.getElementById('lesson-progress-text'),
+            theory: document.getElementById('theory-content'),
+            desc: document.getElementById('challenge-desc'),
+            editor: document.getElementById('code-input'),
+            console: document.getElementById('console-output'),
+            statusBadge: document.getElementById('status-badge'),
+            btnRun: document.getElementById('run-btn'),
+            btnNext: document.getElementById('next-btn'),
+            menuBtn: document.getElementById('mobile-menu-btn')
         };
 
-        // Función para renderizar la lista de navegación
-        function renderNavigation() {
-            dom.topicList.innerHTML = '';
-            lessons.forEach((lesson, index) => {
+        function renderNav() {
+            ui.nav.innerHTML = '';
+            lessons.forEach((l, idx) => {
                 const btn = document.createElement('button');
-                btn.className = `nav-item w-full text-left px-6 py-3 text-sm transition-colors hover:bg-gray-50 focus:outline-none ${index === currentLessonIndex ? 'active' : 'text-gray-600'}`;
-                btn.innerText = lesson.title;
-                btn.onclick = () => loadLesson(index);
-                dom.topicList.appendChild(btn);
+                btn.onclick = () => loadLesson(idx);
+                const isActive = idx === currentIndex;
+                
+                // Estilos dinámicos para los botones de navegación
+                btn.className = `w-full text-left px-6 py-4 text-sm font-medium transition-all duration-200 border-l-4 focus:outline-none flex items-center justify-between group ${
+                    isActive 
+                    ? 'nav-item active' 
+                    : 'border-transparent text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+                }`;
+                
+                btn.innerHTML = `
+                    <span class="flex items-center gap-3">
+                        <span class="w-6 h-6 rounded-md flex items-center justify-center text-xs ${isActive ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30' : 'bg-slate-800 text-slate-500 group-hover:bg-slate-700'}">${idx + 1}</span>
+                        ${l.title}
+                    </span>
+                    ${idx < currentIndex ? '<i class="fa-solid fa-check text-emerald-500"></i>' : ''}
+                `;
+                ui.nav.appendChild(btn);
             });
         }
 
-        // Función para cargar una lección
-        function loadLesson(index) {
-            currentLessonIndex = index;
-            const lesson = lessons[index];
-
-            // Actualizar UI
-            dom.lessonTitle.innerText = lesson.title;
-            dom.lessonProgress.innerText = `Nivel ${index + 1}/${lessons.length}`;
-            dom.theoryContent.innerHTML = lesson.theory;
-            dom.challengeDesc.innerHTML = lesson.challenge;
-            dom.codeInput.value = lesson.initialCode;
+        function loadLesson(idx) {
+            currentIndex = idx;
+            const lesson = lessons[idx];
             
-            // Resetear consola y botones
-            dom.consoleOutput.innerText = "Esperando ejecución...";
-            dom.consoleOutput.className = "console-output";
-            dom.nextBtn.classList.add('hidden');
-            dom.nextBtn.classList.remove('flex'); // Asegurar compatibilidad con flex
-            dom.runBtn.innerText = "Ejecutar Código";
+            // Animación de carga
+            ui.title.innerHTML = `<span class="inline-block w-2 h-8 bg-blue-500 rounded-full mr-1"></span> ${lesson.title}`;
+            ui.theory.innerHTML = lesson.theory;
+            ui.desc.innerHTML = lesson.challenge;
+            ui.editor.value = lesson.initialCode;
             
-            // Re-renderizar navegación para actualizar clase 'active'
-            renderNavigation();
+            // Reset Console & Controls
+            ui.console.innerHTML = `<span class="text-slate-500">$ python3 main.py</span><br><span class="opacity-50">Esperando ejecución...</span><span class="cursor-blink text-blue-500">_</span>`;
+            ui.console.className = "bg-slate-900 rounded-lg p-4 font-mono text-sm min-h-[120px] max-h-[200px] overflow-y-auto custom-scrollbar text-slate-300 border border-slate-800 shadow-inner";
+            ui.statusBadge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-500 uppercase";
+            ui.statusBadge.innerText = "IDLE";
+            
+            ui.btnNext.classList.add('hidden');
+            ui.btnNext.classList.remove('flex');
+            ui.btnRun.innerHTML = '<i class="fa-solid fa-play text-xs"></i> Ejecutar';
+            ui.btnRun.className = "flex-1 sm:flex-none px-5 py-2 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white text-sm font-semibold rounded-lg shadow-lg shadow-emerald-900/20 transition-all-300 flex items-center justify-center gap-2 transform active:scale-95";
 
-            // En móvil, cerrar menú al seleccionar
-            if(window.innerWidth < 768) {
-                dom.topicList.classList.add('hidden');
-            }
+            // Update Progress
+            const progress = Math.round(((idx) / lessons.length) * 100);
+            ui.progressBar.style.width = `${progress}%`;
+            ui.progressText.innerText = `${progress}%`;
+
+            renderNav();
+            
+            // Mobile Menu Close
+            if(window.innerWidth < 768) ui.nav.classList.add('hidden');
         }
 
-        // Función "Ejecutar" código (Simulación)
-        function runCode() {
-            const userCode = dom.codeInput.value;
-            const currentLesson = lessons[currentLessonIndex];
-            
-            // Simular tiempo de procesamiento
-            dom.runBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Procesando...';
-            dom.consoleOutput.innerText = "Ejecutando script...";
-            
-            setTimeout(() => {
-                const result = currentLesson.validate(userCode);
+        async function runCode() {
+            const code = ui.editor.value;
+            const lesson = lessons[currentIndex];
 
-                if (result.success) {
-                    dom.consoleOutput.innerText = result.message;
-                    dom.consoleOutput.className = "console-output border border-green-500";
-                    dom.runBtn.innerHTML = '<i class="fa-solid fa-check"></i> ¡Correcto!';
-                    
-                    // Mostrar botón siguiente
-                    dom.nextBtn.classList.remove('hidden');
-                    dom.nextBtn.classList.add('flex');
-                } else {
-                    dom.consoleOutput.innerText = result.message;
-                    dom.consoleOutput.className = "console-output console-error border border-red-500";
-                    dom.runBtn.innerHTML = '<i class="fa-solid fa-play"></i> Ejecutar Código';
-                }
-            }, 600); // 600ms de "fake" delay
-        }
+            // UI Loading State
+            ui.btnRun.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin text-xs"></i> Procesando...';
+            ui.btnRun.classList.add('opacity-75', 'cursor-not-allowed');
+            ui.statusBadge.innerText = "RUNNING";
+            ui.statusBadge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-600 uppercase animate-pulse";
 
-        // Event Listener para avanzar de nivel
-        dom.nextBtn.addEventListener('click', () => {
-            if (currentLessonIndex < lessons.length - 1) {
-                loadLesson(currentLessonIndex + 1);
+            // Simular delay de red/proceso
+            await new Promise(r => setTimeout(r, 600));
+
+            const result = lesson.validate(code);
+
+            // Mostrar resultado en consola
+            const timestamp = new Date().toLocaleTimeString();
+            
+            if (result.success) {
+                ui.console.innerHTML = `
+                    <div class="mb-2 text-slate-500 border-b border-slate-800 pb-1">$ python3 main.py</div>
+                    <div class="text-emerald-400 font-bold mb-1">${result.output}</div>
+                    <div class="mt-2 text-xs text-slate-500">Process finished with exit code 0 (${timestamp})</div>
+                    <div class="mt-2 pt-2 border-t border-slate-800 text-emerald-300"><i class="fa-solid fa-check-circle"></i> ${result.message}</div>
+                `;
+                ui.console.className = "bg-slate-900 rounded-lg p-4 font-mono text-sm min-h-[120px] max-h-[200px] overflow-y-auto custom-scrollbar text-slate-300 border border-emerald-500/50 shadow-lg shadow-emerald-500/10";
+                
+                // Update Button & Status
+                ui.btnRun.innerHTML = '<i class="fa-solid fa-rotate-right text-xs"></i> Reintentar';
+                ui.btnRun.className = "px-5 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-sm font-semibold rounded-lg transition-all flex items-center gap-2";
+                
+                ui.statusBadge.innerText = "SUCCESS";
+                ui.statusBadge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-600 uppercase";
+
+                // Show Next
+                ui.btnNext.classList.remove('hidden');
+                ui.btnNext.classList.add('flex');
+                
+                // Update Progress if completed
+                const progress = Math.round(((currentIndex + 1) / lessons.length) * 100);
+                ui.progressBar.style.width = `${progress}%`;
+                ui.progressText.innerText = `${progress}%`;
+
             } else {
-                alert("¡Felicidades! Has completado el curso introductorio.");
+                ui.console.innerHTML = `
+                    <div class="mb-2 text-slate-500 border-b border-slate-800 pb-1">$ python3 main.py</div>
+                    <div class="text-red-400 font-bold mb-1">${result.output}</div>
+                    <div class="mt-2 text-xs text-slate-500">Process finished with exit code 1 (${timestamp})</div>
+                    <div class="mt-2 pt-2 border-t border-slate-800 text-red-300"><i class="fa-solid fa-circle-xmark"></i> ${result.message}</div>
+                `;
+                ui.console.className = "bg-slate-900 rounded-lg p-4 font-mono text-sm min-h-[120px] max-h-[200px] overflow-y-auto custom-scrollbar text-slate-300 border border-red-500/50 shadow-lg shadow-red-500/10";
+                
+                ui.btnRun.innerHTML = '<i class="fa-solid fa-play text-xs"></i> Ejecutar';
+                ui.btnRun.classList.remove('opacity-75', 'cursor-not-allowed');
+                
+                ui.statusBadge.innerText = "ERROR";
+                ui.statusBadge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-600 uppercase";
             }
+        }
+
+        // Listeners
+        ui.btnRun.addEventListener('click', runCode);
+        ui.btnNext.addEventListener('click', () => {
+            if (currentIndex < lessons.length - 1) loadLesson(currentIndex + 1);
+            else alert("¡Curso completado! 🚀");
         });
+        ui.menuBtn.addEventListener('click', () => ui.nav.classList.toggle('hidden'));
 
-        // Event Listener para el botón ejecutar
-        dom.runBtn.addEventListener('click', runCode);
-
-        // Event Listener para menú móvil
-        dom.mobileMenuBtn.addEventListener('click', () => {
-            dom.topicList.classList.toggle('hidden');
-        });
-
-        // Permitir tabulación en el textarea (básico)
-        dom.codeInput.addEventListener('keydown', function(e) {
+        // Tab support in Textarea
+        ui.editor.addEventListener('keydown', function(e) {
             if (e.key == 'Tab') {
                 e.preventDefault();
                 var start = this.selectionStart;
                 var end = this.selectionEnd;
-
-                // Insertar 4 espacios
-                this.value = this.value.substring(0, start) +
-                    "    " + this.value.substring(end);
-
-                // Mover cursor
+                this.value = this.value.substring(0, start) + "    " + this.value.substring(end);
                 this.selectionStart = this.selectionEnd = start + 4;
             }
         });
 
-        // Inicializar la app
-        window.addEventListener('DOMContentLoaded', () => {
-            renderNavigation();
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
             loadLesson(0);
         });
-
     </script>
 </body>
-</html>             
+</html>
