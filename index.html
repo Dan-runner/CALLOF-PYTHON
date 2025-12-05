@@ -1,16 +1,402 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <script type="module" src="app.js"></script>
-    <title>CALLOF-PYTHON</title>
+    <title>Aprende Python Interactivo</title>
+    
+    <!-- Carga de librerías externas para estilos e iconos -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- 
+      =======================================================================
+      SECCIÓN CSS (style.css)
+      Si separas los archivos, mueve el contenido dentro de <style> a un .css
+      =======================================================================
+    -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        /* Estilos para el editor de código */
+        .code-font {
+            font-family: 'Fira Code', monospace;
+        }
+
+        .editor-container {
+            position: relative;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            background-color: #1e293b; /* Slate 800 */
+        }
+
+        /* Área de texto donde escribe el usuario */
+        #code-input {
+            width: 100%;
+            height: 250px;
+            background-color: transparent;
+            color: #e2e8f0;
+            border: none;
+            padding: 1rem;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            resize: none;
+            outline: none;
+            z-index: 10;
+        }
+
+        /* Estilos para la consola simulada */
+        .console-output {
+            background-color: #0f172a; /* Slate 900 */
+            color: #10b981; /* Emerald 500 */
+            font-family: 'Fira Code', monospace;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            min-height: 80px;
+            margin-top: 1rem;
+            white-space: pre-wrap;
+        }
+
+        .console-error {
+            color: #ef4444; /* Red 500 */
+        }
+
+        /* Scrollbar personalizado */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+
+        /* Efecto para el elemento activo de la navegación */
+        .nav-item.active {
+            background-color: #dbeafe; /* Blue 100 */
+            color: #2563eb; /* Blue 600 */
+            border-right: 4px solid #2563eb;
+            font-weight: 600;
+        }
+    </style>
 </head>
-<body>
-    <H1>MI JUEGO NO BULTO</H1>
-    <div class="container">   
-    <div id="app">
-    </div>  
+<body class="h-screen flex flex-col md:flex-row overflow-hidden">
+
+    <!-- 
+      =======================================================================
+      ESTRUCTURA HTML (index.html)
+      =======================================================================
+    -->
+
+    <!-- Sidebar / Navegación -->
+    <aside class="w-full md:w-64 bg-white border-r border-gray-200 flex-shrink-0 flex flex-col z-20 shadow-md md:shadow-none h-auto md:h-full">
+        <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-slate-900 text-white md:bg-white md:text-slate-900">
+            <div class="flex items-center gap-2">
+                <i class="fa-brands fa-python text-2xl text-yellow-400 md:text-blue-600"></i>
+                <h1 class="text-lg font-bold tracking-tight">PyStarter</h1>
+            </div>
+            <!-- Botón menú móvil -->
+            <button id="mobile-menu-btn" class="md:hidden text-white focus:outline-none">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+
+        <!-- Lista de Temas -->
+        <nav id="topic-list" class="flex-1 overflow-y-auto hidden md:block py-2">
+            <!-- Los temas se generarán dinámicamente con JS -->
+        </nav>
+
+        <div class="p-4 border-t border-gray-100 text-xs text-gray-500 text-center hidden md:block">
+            &copy; 2023 PyStarter Edu
+        </div>
+    </aside>
+
+    <!-- Área Principal de Contenido -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden relative">
+        
+        <!-- Header Móvil del Tema (Opcional visualmente en escritorio) -->
+        <header class="bg-white border-b border-gray-200 p-4 shadow-sm flex justify-between items-center">
+            <h2 id="lesson-title" class="text-xl font-bold text-gray-800">Cargando...</h2>
+            <div class="text-sm font-medium px-3 py-1 bg-blue-100 text-blue-700 rounded-full" id="lesson-progress">
+                Nivel 1
+            </div>
+        </header>
+
+        <!-- Contenedor Scrollable -->
+        <div class="flex-1 overflow-y-auto p-4 md:p-8">
+            <div class="max-w-4xl mx-auto space-y-6">
+
+                <!-- Sección: Teoría -->
+                <section class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-center gap-2 mb-4">
+                        <i class="fa-solid fa-book-open text-blue-500"></i>
+                        <h3 class="text-lg font-semibold text-gray-800">Concepto Teórico</h3>
+                    </div>
+                    <div id="theory-content" class="prose text-gray-600 leading-relaxed">
+                        <!-- El contenido teórico se inyecta aquí -->
+                    </div>
+                </section>
+
+                <!-- Sección: Desafío y Editor -->
+                <section class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-center gap-2 mb-4">
+                        <i class="fa-solid fa-code text-green-600"></i>
+                        <h3 class="text-lg font-semibold text-gray-800">Tu Misión</h3>
+                    </div>
+                    
+                    <p id="challenge-desc" class="mb-4 text-gray-700 font-medium bg-green-50 p-3 rounded-md border border-green-100">
+                        <!-- Descripción del desafío aquí -->
+                    </p>
+
+                    <!-- Editor de Código -->
+                    <div class="editor-container shadow-inner">
+                        <div class="flex justify-between items-center bg-slate-700 px-4 py-2 border-b border-slate-600">
+                            <span class="text-xs text-slate-300 font-mono">main.py</span>
+                            <span class="text-xs text-slate-400"><i class="fa-brands fa-python"></i> Python 3.x</span>
+                        </div>
+                        <textarea id="code-input" class="code-font" spellcheck="false" placeholder="# Escribe tu código aquí..."></textarea>
+                    </div>
+
+                    <!-- Botones de Acción -->
+                    <div class="mt-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+                        <button id="run-btn" class="w-full sm:w-auto px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg shadow transition-colors flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-play"></i> Ejecutar Código
+                        </button>
+                        
+                        <!-- Botón Siguiente Nivel (Oculto inicialmente) -->
+                        <button id="next-btn" class="w-full sm:w-auto px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow transition-colors items-center justify-center gap-2 hidden">
+                            Siguiente Lección <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+
+                    <!-- Consola / Salida -->
+                    <div class="mt-6">
+                        <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Terminal / Salida:</label>
+                        <div id="console-output" class="console-output">Esperando ejecución...</div>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- 
+      =======================================================================
+      SECCIÓN JAVASCRIPT (script.js)
+      Si separas los archivos, mueve el contenido dentro de <script> a un .js
+      =======================================================================
+    -->
+    <script>
+        /* --- DATOS: Configuración de las Lecciones --- */
+        const lessons = [
+            {
+                id: 0,
+                title: "1. Introducción y Variables",
+                theory: `
+                    <p>En Python, una <strong>variable</strong> es como una caja donde puedes guardar información. A diferencia de otros lenguajes, no necesitas declarar el tipo de dato; Python es lo suficientemente inteligente para saberlo.</p>
+                    <br>
+                    <p class="font-mono text-sm bg-gray-100 p-2 rounded">nombre_variable = valor</p>
+                    <br>
+                    <p>Para asignar un valor, usamos el signo igual (<code>=</code>).</p>
+                `,
+                challenge: "Declara una variable llamada <code>edad</code> y asígnale el valor numérico <code>25</code>.",
+                initialCode: "# Declara tu variable aquí\n",
+                validate: (code) => {
+                    // Regex busca: palabra 'edad', opcionalmente espacios, signo igual, opcionalmente espacios, numero 25
+                    const regex = /(^|\n)\s*edad\s*=\s*25\s*($|\n|#)/;
+                    if (regex.test(code)) {
+                        return { success: true, message: ">> Variable asignada correctamente en memoria.\n>> edad = 25" };
+                    } else {
+                        // Verificaciones parciales para dar mejores pistas
+                        if(code.includes('25') && !code.includes('edad')) return { success: false, message: "Error: Tienes el valor 25, pero la variable debe llamarse 'edad'." };
+                        if(code.includes('edad') && !code.includes('25')) return { success: false, message: "Error: Creaste la variable 'edad', pero el valor no es 25." };
+                        return { success: false, message: "NameError: No se encontró la definición correcta de la variable 'edad'." };
+                    }
+                }
+            },
+            {
+                id: 1,
+                title: "2. Tipos de Datos y Strings",
+                theory: `
+                    <p>Las cadenas de texto (Strings) en Python se definen usando comillas simples (<code>' '</code>) o dobles (<code>" "</code>).</p>
+                    <p class="mt-2">Podemos unir (concatenar) textos usando el operador <code>+</code>.</p>
+                    <br>
+                    <p class="font-mono text-sm bg-gray-100 p-2 rounded">print("Hola " + "Mundo")</p>
+                `,
+                challenge: "Usa la función <code>print()</code> para mostrar en pantalla la frase exacta: <strong>Hola Python</strong>",
+                initialCode: "# Imprime el mensaje abajo\n",
+                validate: (code) => {
+                    // Busca variaciones de print("Hola Python") o print('Hola Python')
+                    const regex = /print\s*\(\s*(["'])Hola Python\1\s*\)/;
+                    if (regex.test(code)) {
+                        return { success: true, message: "Hola Python\n\n>> ¡Programa ejecutado con éxito!" };
+                    }
+                    return { success: false, message: "Error: Asegúrate de usar print() y que el texto sea exactamente 'Hola Python' entre comillas." };
+                }
+            },
+            {
+                id: 2,
+                title: "3. Condicionales (If)",
+                theory: `
+                    <p>Los condicionales nos permiten tomar decisiones. La sentencia <code>if</code> ejecuta un bloque de código solo si la condición es verdadera.</p>
+                    <p class="mt-2 text-red-500 font-semibold">¡Importante! Python usa la indentación (sangría) para definir qué código está dentro del if.</p>
+                    <br>
+                    <pre class="font-mono text-sm bg-gray-100 p-2 rounded">if numero > 10:
+    print("Es mayor")</pre>
+                `,
+                challenge: "Escribe una condición <code>if</code> que verifique si <code>x</code> es mayor que 5. Si es cierto, imprime 'Mayor'. (Asume que x ya vale 10).",
+                initialCode: "x = 10\n# Escribe tu if abajo:\n",
+                validate: (code) => {
+                    // Validar estructura básica: if x > 5:
+                    const ifRegex = /if\s+x\s*>\s*5\s*:/;
+                    // Validar el print con indentación
+                    const printRegex = /\n\s+print\s*\(\s*(["'])Mayor\1\s*\)/;
+                    
+                    if (!ifRegex.test(code)) {
+                        return { success: false, message: "SyntaxError: Revisa la línea del 'if'. Debe ser: if x > 5:" };
+                    }
+                    if (!printRegex.test(code)) {
+                        return { success: false, message: "IndentationError: Asegúrate de que el print esté indentado (con espacios) debajo del if y que imprimas 'Mayor'." };
+                    }
+                    return { success: true, message: "Mayor\n\n>> Lógica condicional correcta." };
+                }
+            }
+        ];
+
+        /* --- LÓGICA DE LA APLICACIÓN --- */
+        let currentLessonIndex = 0;
+
+        // Elementos del DOM
+        const dom = {
+            topicList: document.getElementById('topic-list'),
+            lessonTitle: document.getElementById('lesson-title'),
+            lessonProgress: document.getElementById('lesson-progress'),
+            theoryContent: document.getElementById('theory-content'),
+            challengeDesc: document.getElementById('challenge-desc'),
+            codeInput: document.getElementById('code-input'),
+            runBtn: document.getElementById('run-btn'),
+            nextBtn: document.getElementById('next-btn'),
+            consoleOutput: document.getElementById('console-output'),
+            mobileMenuBtn: document.getElementById('mobile-menu-btn')
+        };
+
+        // Función para renderizar la lista de navegación
+        function renderNavigation() {
+            dom.topicList.innerHTML = '';
+            lessons.forEach((lesson, index) => {
+                const btn = document.createElement('button');
+                btn.className = `nav-item w-full text-left px-6 py-3 text-sm transition-colors hover:bg-gray-50 focus:outline-none ${index === currentLessonIndex ? 'active' : 'text-gray-600'}`;
+                btn.innerText = lesson.title;
+                btn.onclick = () => loadLesson(index);
+                dom.topicList.appendChild(btn);
+            });
+        }
+
+        // Función para cargar una lección
+        function loadLesson(index) {
+            currentLessonIndex = index;
+            const lesson = lessons[index];
+
+            // Actualizar UI
+            dom.lessonTitle.innerText = lesson.title;
+            dom.lessonProgress.innerText = `Nivel ${index + 1}/${lessons.length}`;
+            dom.theoryContent.innerHTML = lesson.theory;
+            dom.challengeDesc.innerHTML = lesson.challenge;
+            dom.codeInput.value = lesson.initialCode;
+            
+            // Resetear consola y botones
+            dom.consoleOutput.innerText = "Esperando ejecución...";
+            dom.consoleOutput.className = "console-output";
+            dom.nextBtn.classList.add('hidden');
+            dom.nextBtn.classList.remove('flex'); // Asegurar compatibilidad con flex
+            dom.runBtn.innerText = "Ejecutar Código";
+            
+            // Re-renderizar navegación para actualizar clase 'active'
+            renderNavigation();
+
+            // En móvil, cerrar menú al seleccionar
+            if(window.innerWidth < 768) {
+                dom.topicList.classList.add('hidden');
+            }
+        }
+
+        // Función "Ejecutar" código (Simulación)
+        function runCode() {
+            const userCode = dom.codeInput.value;
+            const currentLesson = lessons[currentLessonIndex];
+            
+            // Simular tiempo de procesamiento
+            dom.runBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Procesando...';
+            dom.consoleOutput.innerText = "Ejecutando script...";
+            
+            setTimeout(() => {
+                const result = currentLesson.validate(userCode);
+
+                if (result.success) {
+                    dom.consoleOutput.innerText = result.message;
+                    dom.consoleOutput.className = "console-output border border-green-500";
+                    dom.runBtn.innerHTML = '<i class="fa-solid fa-check"></i> ¡Correcto!';
+                    
+                    // Mostrar botón siguiente
+                    dom.nextBtn.classList.remove('hidden');
+                    dom.nextBtn.classList.add('flex');
+                } else {
+                    dom.consoleOutput.innerText = result.message;
+                    dom.consoleOutput.className = "console-output console-error border border-red-500";
+                    dom.runBtn.innerHTML = '<i class="fa-solid fa-play"></i> Ejecutar Código';
+                }
+            }, 600); // 600ms de "fake" delay
+        }
+
+        // Event Listener para avanzar de nivel
+        dom.nextBtn.addEventListener('click', () => {
+            if (currentLessonIndex < lessons.length - 1) {
+                loadLesson(currentLessonIndex + 1);
+            } else {
+                alert("¡Felicidades! Has completado el curso introductorio.");
+            }
+        });
+
+        // Event Listener para el botón ejecutar
+        dom.runBtn.addEventListener('click', runCode);
+
+        // Event Listener para menú móvil
+        dom.mobileMenuBtn.addEventListener('click', () => {
+            dom.topicList.classList.toggle('hidden');
+        });
+
+        // Permitir tabulación en el textarea (básico)
+        dom.codeInput.addEventListener('keydown', function(e) {
+            if (e.key == 'Tab') {
+                e.preventDefault();
+                var start = this.selectionStart;
+                var end = this.selectionEnd;
+
+                // Insertar 4 espacios
+                this.value = this.value.substring(0, start) +
+                    "    " + this.value.substring(end);
+
+                // Mover cursor
+                this.selectionStart = this.selectionEnd = start + 4;
+            }
+        });
+
+        // Inicializar la app
+        window.addEventListener('DOMContentLoaded', () => {
+            renderNavigation();
+            loadLesson(0);
+        });
+
+    </script>
 </body>
-</html>                  
+</html>             
