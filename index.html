@@ -7,7 +7,7 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght=300;400;600;700&display=swap" rel="stylesheet">
     
     <script>
         tailwind.config = {
@@ -19,11 +19,11 @@
                     },
                     colors: {
                         brand: {
-                            dark: '#0f172a',    // Slate 900
-                            primary: '#3b82f6', // Blue 500
-                            accent: '#8b5cf6',  // Violet 500
-                            success: '#10b981', // Emerald 500
-                            editor: '#1e293b',  // Slate 800
+                            dark: '#0f172a',
+                            primary: '#3b82f6',
+                            accent: '#8b5cf6',
+                            success: '#10b981',
+                            editor: '#1e293b',
                         }
                     }
                 }
@@ -31,7 +31,7 @@
         }
     </script>
 
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css"> 
 </head>
 
 <body class="h-screen flex flex-col md:flex-row overflow-hidden text-slate-800">
@@ -96,7 +96,8 @@
                         <h3 class="font-bold text-slate-700">Concepto Clave</h3>
                     </div>
                     <div id="theory-content" class="p-6 prose prose-slate max-w-none text-slate-600 leading-relaxed">
-                        </div>
+                        <p>Cargando contenido de la lección...</p>
+                    </div>
                 </section>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -111,7 +112,8 @@
                             </div>
                             
                             <div id="challenge-desc" class="flex-1 text-slate-700 font-medium mb-6">
-                                </div>
+                                <p>Cargando desafío...</p>
+                            </div>
 
                             <div class="mt-auto">
                                 <div class="flex items-center justify-between mb-2">
@@ -160,7 +162,7 @@
                                     <i class="fa-solid fa-play text-xs"></i> Ejecutar
                                 </button>
                                 
-                                <button id="next-btn" class="hidden flex-1 sm:flex-none px-5 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-sm font-semibold rounded-lg shadow-lg shadow-blue-900/20 transition-all-300 items-center justify-center gap-2 transform active:scale-95 animate-pulse">
+                                <button id="next-btn" class="hidden flex-1 sm:flex-none px-5 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-sm font-semibold rounded-lg shadow-lg shadow-blue-900/20 transition-all-300 items-center justify-center gap-2 transform active:scale-95">
                                     Siguiente <i class="fa-solid fa-arrow-right text-xs"></i>
                                 </button>
                             </div>
