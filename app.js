@@ -91,7 +91,6 @@ const lessons = [
         challenge: "Escribe un bucle <code>for</code> que imprima los números **0, 1, 2, 3** utilizando la función <code>range()</code>.",
         initialCode: "# Escribe tu bucle aquí:\n",
         validate: (code) => {
-            // Validación simulada simple para el ejercicio
             if (code.includes('for i in range(4):') && code.includes('print(i)')) {
                  return { success: true, output: "0\n1\n2\n3", message: "¡Bucle perfecto!" };
             }
@@ -165,7 +164,14 @@ function renderNav() {
         const isActive = idx === currentIndex;
 
         const btn = document.createElement('button');
-        btn.onclick = () => loadLesson(idx);
+        
+        // La lección se carga SOLO si no está bloqueada
+        if (!isLocked) {
+            btn.onclick = () => loadLesson(idx);
+        } else {
+            // Mensaje de advertencia al intentar hacer clic en un nivel bloqueado
+            btn.onclick = () => alert("¡Nivel bloqueado! Completa el nivel anterior para desbloquear este.");
+        }
 
         // Clases base
         let className = `w-full text-left px-6 py-4 text-sm font-medium transition-all duration-200 border-l-4 focus:outline-none flex items-center justify-between group`;
@@ -224,6 +230,7 @@ function updateProgressBar() {
 function loadLesson(idx) {
     const lesson = lessons[idx];
 
+    // Esta verificación ya se hace en renderNav, pero la mantenemos como seguridad
     if (lesson.locked) {
         alert("¡Nivel bloqueado! Completa el nivel anterior para desbloquear este.");
         return;
@@ -243,9 +250,15 @@ function loadLesson(idx) {
     ui.statusBadge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-500 uppercase";
     ui.statusBadge.innerText = "IDLE";
 
-    ui.btnNext.classList.add('hidden');
-    ui.btnNext.classList.remove('flex');
-    ui.btnRun.classList.remove('hidden'); // Asegura que el botón de Run esté visible
+    // Ocultar/Mostrar botón Siguiente si ya fue completada
+    if (lesson.completed && currentIndex < lessons.length - 1) {
+        ui.btnNext.classList.remove('hidden');
+        ui.btnNext.classList.add('flex');
+    } else {
+        ui.btnNext.classList.add('hidden');
+        ui.btnNext.classList.remove('flex');
+    }
+
     ui.btnRun.innerHTML = '<i class="fa-solid fa-play text-xs"></i> Ejecutar';
     ui.btnRun.className = "flex-1 sm:flex-none px-5 py-2 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white text-sm font-semibold rounded-lg shadow-lg shadow-emerald-900/20 transition-all-300 flex items-center justify-center gap-2 transform active:scale-95";
 
@@ -330,6 +343,7 @@ async function runCode() {
     }
 }
 
+
 /* --- LISTENERS --- */
 ui.btnRun.addEventListener('click', runCode);
 ui.btnNext.addEventListener('click', () => {
@@ -350,7 +364,7 @@ ui.editor.addEventListener('keydown', function(e) {
 });
 
 
-// Init: Inicia la carga del juego inmediatamente al cargar la página.
+// Init: Carga el progreso y la primera lección disponible inmediatamente.
 document.addEventListener('DOMContentLoaded', () => {
     loadProgress();
     loadLesson(currentIndex);
